@@ -1,0 +1,29 @@
+{
+  "slug": "frontend-state-management",
+  "version": 1,
+  "title": "Interactive Cart State Management & Validation",
+  "category": "frontend",
+  "type": "feature_build",
+  "difficulty": 2,
+  "timeEstimateMinutes": 40,
+  "skillsTested": [
+    {
+      "skillName": "Component Architecture",
+      "category": "frontend",
+      "isPrimary": true
+    },
+    {
+      "skillName": "Client State Management",
+      "category": "frontend",
+      "isPrimary": true
+    },
+    {
+      "skillName": "Responsive Layout & Accessibility",
+      "category": "frontend",
+      "isPrimary": false
+    }
+  ],
+  "rubricVersion": "v1.0",
+  "runtime": "node20",
+  "status": "active"
+}

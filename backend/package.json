@@ -1,0 +1,44 @@
+{
+  "name": "workproof-backend",
+  "version": "1.0.0",
+  "description": "WorkProof AI API Core - Skills to Proof to Opportunity",
+  "main": "dist/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit",
+    "test": "NODE_ENV=test tsx src/tests/profile.test.ts && NODE_ENV=test tsx src/tests/resume.test.ts && NODE_ENV=test tsx src/tests/github.test.ts && NODE_ENV=test tsx src/tests/skill-gap.test.ts && NODE_ENV=test tsx src/tests/mission-execution.test.ts && NODE_ENV=test tsx src/tests/evaluation.test.ts && NODE_ENV=test tsx src/tests/recruiter.test.ts && NODE_ENV=test tsx src/tests/passport.test.ts && NODE_ENV=test tsx src/tests/opportunity.test.ts"
+  },
+  "keywords": ["skills-first", "verification", "hiring-signal", "workproof"],
+  "author": "WorkProof AI Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.7.0",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.10.3",
+    "multer": "^2.4.0",
+    "uuid": "^14.0.2",
+    "winston": "^3.19.0",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.3.0",
+    "@types/node": "^26.6.4",
+    "@types/uuid": "^10.0.0",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.8.2"
+  }
+}

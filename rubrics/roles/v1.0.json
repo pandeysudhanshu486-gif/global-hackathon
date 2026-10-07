@@ -1,0 +1,266 @@
+{
+  "version": "v1.0",
+  "updatedAt": "2026-10-02T00:00:00Z",
+  "roles": [
+    {
+      "roleId": "backend-developer",
+      "name": "Backend Developer",
+      "category": "Software Engineering",
+      "description": "Designs, develops, and maintains server-side logic, RESTful APIs, microservices, and database persistence architectures.",
+      "capabilities": [
+        {
+          "capabilityId": "api-development",
+          "name": "API Development",
+          "category": "backend",
+          "importance": "core",
+          "description": "Ability to design, implement, and document deterministic RESTful HTTP API endpoints with proper routing, status codes, and input validation.",
+          "technologies": ["Node.js", "Express", "Python", "FastAPI", "Django", "Java", "Spring Boot", "Go", "REST API"],
+          "evidenceRequirement": "Working HTTP handlers with automated integration test coverage and status code verification.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "debugging-error-handling",
+          "name": "Backend Debugging & Error Handling",
+          "category": "backend",
+          "importance": "core",
+          "description": "Ability to diagnose runtime errors, race conditions, edge-case arithmetic defects, and structure centralized error responses.",
+          "technologies": ["Debugging", "Logging", "Error Handling", "Node.js", "Python"],
+          "evidenceRequirement": "Diagnosis of root cause in existing code and verified bug fix submission.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "automated-testing",
+          "name": "Automated Testing & Regression",
+          "category": "testing",
+          "importance": "core",
+          "description": "Ability to author comprehensive unit tests, mock external dependencies, and assert boundary conditions and regressions.",
+          "technologies": ["Jest", "Mocha", "PyTest", "Testing", "Unit Tests", "Integration Tests"],
+          "evidenceRequirement": "Candidate-authored test suite achieving 100% pass rate on edge cases.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "database-fundamentals",
+          "name": "Database Fundamentals & Schema Design",
+          "category": "database",
+          "importance": "core",
+          "description": "Understanding relational and document data modeling, indexing, query optimization, and data integrity constraints.",
+          "technologies": ["MongoDB", "PostgreSQL", "MySQL", "Redis", "SQL", "Mongoose", "Prisma"],
+          "evidenceRequirement": "Schema definitions, query pipelines, and transaction integrity checks.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "auth-security-basics",
+          "name": "Authentication & Security Basics",
+          "category": "backend",
+          "importance": "recommended",
+          "description": "Implementation of secure password hashing, JWT stateless authentication, authorization middlewares, and input sanitization.",
+          "technologies": ["JWT", "Bcrypt", "Auth", "Security", "OAuth", "Helmet", "CORS"],
+          "evidenceRequirement": "Token verification middleware and role-based access control tests.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "git-version-control",
+          "name": "Git & Version Control",
+          "category": "devops",
+          "importance": "recommended",
+          "description": "Proficiency with atomic commits, branch workflows, diff inspection, and clean pull request descriptions.",
+          "technologies": ["Git", "GitHub", "Version Control"],
+          "evidenceRequirement": "Clean commit history and structured technical submission explanation.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        }
+      ]
+    },
+    {
+      "roleId": "frontend-developer",
+      "name": "Frontend Developer",
+      "category": "Software Engineering",
+      "description": "Builds responsive, accessible, interactive web user interfaces using modern component frameworks and state management.",
+      "capabilities": [
+        {
+          "capabilityId": "component-architecture",
+          "name": "Component Architecture",
+          "category": "frontend",
+          "importance": "core",
+          "description": "Structuring modular, reusable, typed UI components with clean prop contracts and lifecycle separation.",
+          "technologies": ["React", "TypeScript", "Vue", "Next.js", "HTML", "CSS"],
+          "evidenceRequirement": "Clean component tree with typed props and zero compilation warnings.",
+          "defaultMissionSlug": "frontend-state-management"
+        },
+        {
+          "capabilityId": "client-state-management",
+          "name": "Client State Management",
+          "category": "frontend",
+          "importance": "core",
+          "description": "Managing complex asynchronous data fetching, local component state, cache synchronization, and optimistic UI updates.",
+          "technologies": ["React Hooks", "Redux", "Zustand", "Context API", "TanStack Query"],
+          "evidenceRequirement": "Predictable state transitions verified by interactive DOM test assertions.",
+          "defaultMissionSlug": "frontend-state-management"
+        },
+        {
+          "capabilityId": "responsive-accessible-ui",
+          "name": "Responsive Layout & Accessibility (a11y)",
+          "category": "frontend",
+          "importance": "core",
+          "description": "Crafting fluid layouts across mobile/desktop viewports and adhering to WCAG standards (keyboard navigation, ARIA semantics).",
+          "technologies": ["Tailwind CSS", "CSS Grid", "Flexbox", "ARIA", "Semantic HTML"],
+          "evidenceRequirement": "Responsive layout without horizontal overflow and screen-reader accessible elements.",
+          "defaultMissionSlug": "frontend-state-management"
+        },
+        {
+          "capabilityId": "frontend-api-integration",
+          "name": "REST/API Client Integration",
+          "category": "frontend",
+          "importance": "core",
+          "description": "Handling HTTP fetch lifecycles, graceful loading skeletons, network retry logic, and validation error displays.",
+          "technologies": ["Fetch API", "Axios", "REST API", "JSON"],
+          "evidenceRequirement": "Async network state handling covering loading, success, and error boundaries.",
+          "defaultMissionSlug": "frontend-state-management"
+        },
+        {
+          "capabilityId": "frontend-testing",
+          "name": "UI Component Testing",
+          "category": "testing",
+          "importance": "recommended",
+          "description": "Writing automated unit and integration tests for user interactions, forms, and render outputs.",
+          "technologies": ["React Testing Library", "Jest", "Vitest", "Playwright"],
+          "evidenceRequirement": "Passing user-event test suite simulating clicks, typing, and state assertions.",
+          "defaultMissionSlug": "frontend-state-management"
+        }
+      ]
+    },
+    {
+      "roleId": "fullstack-developer",
+      "name": "Full Stack Developer",
+      "category": "Software Engineering",
+      "description": "Delivers end-to-end features spanning responsive frontend interfaces, REST APIs, database models, and deployment configurations.",
+      "capabilities": [
+        {
+          "capabilityId": "api-development",
+          "name": "API Development",
+          "category": "backend",
+          "importance": "core",
+          "description": "Design and implementation of deterministic REST APIs with validation and error handling.",
+          "technologies": ["Node.js", "Express", "Python", "REST API"],
+          "evidenceRequirement": "End-to-end API route execution with passing test assertions.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "component-architecture",
+          "name": "Component Architecture",
+          "category": "frontend",
+          "importance": "core",
+          "description": "Reusable UI components integrated with backend REST responses.",
+          "technologies": ["React", "TypeScript", "Tailwind CSS"],
+          "evidenceRequirement": "Interactive frontend components connected to API endpoints.",
+          "defaultMissionSlug": "frontend-state-management"
+        },
+        {
+          "capabilityId": "database-fundamentals",
+          "name": "Database Fundamentals",
+          "category": "database",
+          "importance": "core",
+          "description": "Data modeling and query persistence in relational or NoSQL datastores.",
+          "technologies": ["MongoDB", "PostgreSQL", "Mongoose"],
+          "evidenceRequirement": "Database CRUD operations with schema validation.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "debugging-error-handling",
+          "name": "Full-Stack Debugging",
+          "category": "backend",
+          "importance": "core",
+          "description": "Tracing defects across network boundaries, client state, and backend controllers.",
+          "technologies": ["Debugging", "Testing", "Logging"],
+          "evidenceRequirement": "Verified resolution of cross-boundary bugs.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "automated-testing",
+          "name": "Automated Testing",
+          "category": "testing",
+          "importance": "recommended",
+          "description": "Writing tests across both API layers and UI components.",
+          "technologies": ["Jest", "Vitest", "Unit Testing"],
+          "evidenceRequirement": "Combined test pass rate on automated evaluation suite.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        }
+      ]
+    },
+    {
+      "roleId": "data-analyst",
+      "name": "Data Analyst",
+      "category": "Data & Analytics",
+      "description": "Extracts, transforms, and analyzes structured datasets to identify trends, formulate insights, and build visualization dashboards.",
+      "capabilities": [
+        {
+          "capabilityId": "sql-querying-aggregations",
+          "name": "SQL & Complex Aggregations",
+          "category": "database",
+          "importance": "core",
+          "description": "Writing multi-table joins, subqueries, window functions, and group-by aggregations for business reporting.",
+          "technologies": ["SQL", "PostgreSQL", "MySQL", "SQLite"],
+          "evidenceRequirement": "Accurate SQL query results against analytical datasets.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "data-cleaning-transformation",
+          "name": "Data Cleaning & Transformation",
+          "category": "data",
+          "importance": "core",
+          "description": "Handling missing values, deduplication, date parsing, and type conversions in tabular datasets.",
+          "technologies": ["Python", "Pandas", "NumPy", "SQL"],
+          "evidenceRequirement": "Automated dataset sanitization pipeline with validation metrics.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "data-visualization-reporting",
+          "name": "Data Visualization & Metrics",
+          "category": "data",
+          "importance": "recommended",
+          "description": "Designing clear visual dashboards, charting metrics, and summarizing distributions.",
+          "technologies": ["Python", "Tableau", "PowerBI", "Matplotlib", "Seaborn"],
+          "evidenceRequirement": "Statistical chart outputs and explanatory insight reports.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        }
+      ]
+    },
+    {
+      "roleId": "aiml-engineer",
+      "name": "AI/ML Engineer",
+      "category": "Artificial Intelligence",
+      "description": "Builds, evaluates, and deploys machine learning models, data preprocessing pipelines, and generative AI integrations.",
+      "capabilities": [
+        {
+          "capabilityId": "ml-fundamentals-modeling",
+          "name": "ML Modeling & Preprocessing",
+          "category": "aiml",
+          "importance": "core",
+          "description": "Feature engineering, dataset splitting, supervised/unsupervised algorithm implementation, and evaluation metric calculation.",
+          "technologies": ["Python", "Scikit-Learn", "PyTorch", "TensorFlow", "Pandas", "NumPy"],
+          "evidenceRequirement": "Model training pipeline with verified precision, recall, and loss evaluation.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "llm-prompt-integration",
+          "name": "LLM & Generative AI Integration",
+          "category": "aiml",
+          "importance": "core",
+          "description": "Designing structured prompting workflows, JSON schema validation, embedding search, and API orchestration.",
+          "technologies": ["Gemini API", "OpenAI API", "LangChain", "Vector DB", "Embeddings"],
+          "evidenceRequirement": "Deterministic schema-validated generative AI pipelines with fallback handling.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        },
+        {
+          "capabilityId": "model-evaluation-testing",
+          "name": "Model Evaluation & Benchmarking",
+          "category": "testing",
+          "importance": "recommended",
+          "description": "Benchmarking models against ground truth datasets and preventing hallucinations.",
+          "technologies": ["Evaluation", "Metrics", "Testing", "Python"],
+          "evidenceRequirement": "Benchmark test suite assertions and accuracy reporting.",
+          "defaultMissionSlug": "backend-order-total-bug"
+        }
+      ]
+    }
+  ]
+}

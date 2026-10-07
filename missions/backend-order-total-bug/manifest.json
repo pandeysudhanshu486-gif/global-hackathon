@@ -1,0 +1,29 @@
+{
+  "slug": "backend-order-total-bug",
+  "version": 1,
+  "title": "E-Commerce Order API Bug Fix & Regression Suite",
+  "category": "backend",
+  "type": "bug_fix",
+  "difficulty": 3,
+  "timeEstimateMinutes": 45,
+  "skillsTested": [
+    {
+      "skillName": "API Development",
+      "category": "backend",
+      "isPrimary": true
+    },
+    {
+      "skillName": "Debugging",
+      "category": "backend",
+      "isPrimary": true
+    },
+    {
+      "skillName": "Testing",
+      "category": "testing",
+      "isPrimary": true
+    }
+  ],
+  "rubricVersion": "v1.0",
+  "runtime": "node20",
+  "status": "active"
+}

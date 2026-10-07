@@ -1,0 +1,86 @@
+{
+  "version": "v1.0",
+  "updatedAt": "2026-10-02T00:00:00Z",
+  "name": "WorkProof Mission Evaluation Rubric",
+  "description": "Standardized evaluation rubric separating deterministic ground-truth verification from assistive qualitative reasoning.",
+  "missionRubrics": [
+    {
+      "missionSlug": "backend-order-total-bug",
+      "deterministicCriteria": [
+        {
+          "id": "functional-correctness",
+          "name": "Functional Correctness & Precision",
+          "type": "deterministic",
+          "required": true,
+          "evaluationMethod": "automated_test_pass",
+          "description": "Order math must compute subtotal, apply discounts, and calculate tax with 100% test pass rate.",
+          "minPassedTests": 3,
+          "targetCapabilities": [
+            { "capabilityId": "api-development", "name": "API Development", "category": "backend" },
+            { "capabilityId": "debugging-error-handling", "name": "Debugging", "category": "backend" }
+          ]
+        },
+        {
+          "id": "test-execution-success",
+          "name": "Test Suite Execution",
+          "type": "deterministic",
+          "required": true,
+          "evaluationMethod": "sandbox_execution",
+          "description": "Zero runtime exceptions, zero syntax errors, and clean exit code.",
+          "minPassedTests": 3,
+          "targetCapabilities": [
+            { "capabilityId": "automated-testing", "name": "Testing", "category": "testing" }
+          ]
+        }
+      ],
+      "assistiveCriteria": [
+        {
+          "id": "technical-explanation",
+          "name": "Technical Explanation & Root Cause Analysis",
+          "type": "assistive",
+          "required": false,
+          "evaluationMethod": "ai_or_heuristic_qualitative_review",
+          "description": "Qualitative evaluation of candidate explanation describing IEEE 754 float precision loss and coupon clamping.",
+          "categories": ["insufficient", "adequate", "strong"]
+        },
+        {
+          "id": "code-maintainability",
+          "name": "Code Maintainability & Cleanliness",
+          "type": "assistive",
+          "required": false,
+          "evaluationMethod": "static_code_inspection",
+          "description": "Assessment of code cleanliness, boundary checks, and naming conventions."
+        }
+      ]
+    },
+    {
+      "missionSlug": "frontend-state-management",
+      "deterministicCriteria": [
+        {
+          "id": "state-correctness",
+          "name": "State Transition Correctness",
+          "type": "deterministic",
+          "required": true,
+          "evaluationMethod": "automated_test_pass",
+          "description": "Component state transitions correctly handle async fetch lifecycles and cache invalidation.",
+          "minPassedTests": 3,
+          "targetCapabilities": [
+            { "capabilityId": "client-state-management", "name": "Client State Management", "category": "frontend" },
+            { "capabilityId": "component-architecture", "name": "Component Architecture", "category": "frontend" }
+          ]
+        }
+      ],
+      "assistiveCriteria": [
+        {
+          "id": "technical-explanation",
+          "name": "Technical Explanation",
+          "type": "assistive",
+          "required": false,
+          "evaluationMethod": "ai_or_heuristic_qualitative_review",
+          "description": "Candidate explanation of state lifecycle and re-render prevention.",
+          "categories": ["insufficient", "adequate", "strong"]
+        }
+      ]
+    }
+  ]
+}

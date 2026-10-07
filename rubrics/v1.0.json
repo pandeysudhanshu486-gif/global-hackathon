@@ -1,0 +1,68 @@
+{
+  "version": "v1.0",
+  "name": "WorkProof Standard Engineering Evaluation Rubric",
+  "description": "Multi-signal evaluation balancing deterministic ground-truth tests, code metrics, and structured AI-assisted qualitative review.",
+  "categories": [
+    {
+      "key": "correctness",
+      "name": "Functional Correctness",
+      "description": "Does the fixed code accurately solve the problem and handle edge cases?",
+      "weight": 0.25,
+      "signalType": "deterministic",
+      "evaluationMethod": "Automated test execution results against hidden evaluation suite"
+    },
+    {
+      "key": "task_completion",
+      "name": "Acceptance Criteria Fulfillment",
+      "description": "Were all stated acceptance criteria in the mission brief met?",
+      "weight": 0.20,
+      "signalType": "deterministic",
+      "evaluationMethod": "Validation checks against acceptance criteria checklist"
+    },
+    {
+      "key": "test_results",
+      "name": "Test & Regression Coverage",
+      "description": "Did the student write meaningful tests and keep existing test suites passing?",
+      "weight": 0.20,
+      "signalType": "deterministic",
+      "evaluationMethod": "Pass rate of student-authored regression tests and baseline tests"
+    },
+    {
+      "key": "code_quality",
+      "name": "Code Cleanliness & Maintainability",
+      "description": "Is the code well-structured, clean of lint errors, and idiomatic?",
+      "weight": 0.15,
+      "signalType": "deterministic",
+      "evaluationMethod": "ESLint error/warning count and static complexity analysis"
+    },
+    {
+      "key": "technical_explanation",
+      "name": "Technical Reasoning & Articulation",
+      "description": "Can the student clearly articulate the root cause and justify their solution?",
+      "weight": 0.10,
+      "signalType": "student_authored",
+      "evaluationMethod": "Structured qualitative review of student's submitted explanation"
+    },
+    {
+      "key": "approach",
+      "name": "Engineering Approach & Best Practices",
+      "description": "Did the student avoid antipatterns and adhere to standard engineering best practices?",
+      "weight": 0.10,
+      "signalType": "ai_assisted",
+      "evaluationMethod": "Bounded AI code review categorized into observations and suggestions"
+    }
+  ],
+  "levelThresholds": {
+    "attempted": 0.25,
+    "limitedEvidence": 0.50,
+    "demonstrated": 0.75,
+    "strongEvidence": 0.90
+  },
+  "rules": {
+    "requireTestPass": true,
+    "requireExplanation": true,
+    "maxAiWeight": 0.30,
+    "minDeterministicScore": 0.60
+  },
+  "isActive": true
+}
