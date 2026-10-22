@@ -5,6 +5,7 @@ import { logger } from '../../shared/logger.js';
 import { NotFoundError, BadRequestError } from '../../shared/errors.js';
 import { env } from '../../config/env.js';
 import { computeSha256 } from '../../shared/hash.js';
+import { SandboxedRunner } from './sandboxed-runner.js';
 import { MissionSessionModel, IMissionSessionDocument } from '../../models/missionSession.model.js';
 import { EvidenceRecordModel } from '../../models/evidenceRecord.model.js';
 import { StudentProfileModel } from '../../models/studentProfile.model.js';
@@ -281,11 +282,11 @@ export class MissionService {
     const session = await this.getOrCreateSession(userId, slug);
     const attemptId = `att_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
-    // Call isolated execution service
-    const executionUrl = `${env.EXECUTION_SERVICE_URL}/execute`;
+    // Execute via external execution service if available, or fallback to co-located subprocess sandbox
     let execResponse: any;
 
     try {
+      const executionUrl = `${env.EXECUTION_SERVICE_URL}/execute`;
       const resp = await fetch(executionUrl, {
         method: 'POST',
         headers: {
@@ -312,9 +313,22 @@ export class MissionService {
       }
 
       execResponse = body.data;
-    } catch (err: any) {
-      logger.error('Error calling execution service:', err);
-      throw new Error(`Failed to execute mission in isolated sandbox: ${err.message}`);
+    } catch (remoteErr: any) {
+      logger.info(
+        `Remote execution service unavailable (${remoteErr.message}); evaluating mission in co-located subprocess sandbox runner`
+      );
+      try {
+        execResponse = await SandboxedRunner.execute({
+          attemptId,
+          missionSlug: slug,
+          files,
+          command: 'test',
+          timeoutMs: 5000,
+        });
+      } catch (sandboxErr: any) {
+        logger.error('Error executing mission in co-located sandbox:', sandboxErr);
+        throw new Error(`Failed to execute mission in isolated sandbox: ${sandboxErr.message}`);
+      }
     }
 
     const isPassed =

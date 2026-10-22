@@ -1,16 +1,16 @@
 # WorkProof AI - Production Render Blueprint
-# Infrastructure as Code specification for WorkProof AI services
+# Optimized for Render Free Tier (Web Service with co-located sandboxed execution boundary)
 version: "1"
 
 services:
-  # 1. WorkProof AI Core API Service (Public Web Service)
+  # WorkProof AI Core API Service (Public Web Service)
   - type: web
     name: workproof-backend
     runtime: node
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: node dist/server.js
     healthCheckPath: /api/health
     autoDeploy: true
@@ -34,29 +34,8 @@ services:
       - key: EXECUTION_SECRET
         generateValue: true
       - key: EXECUTION_SERVICE_URL
-        value: http://workproof-execution-service:5003
+        value: http://localhost:5003
       - key: GEMINI_API_KEY
         sync: false # Optional: Google Gemini API Key for dynamic skill gap suggestions
       - key: GITHUB_TOKEN
         sync: false # Optional: GitHub Personal Access Token for higher rate limits
-
-  # 2. WorkProof AI Isolated Execution Boundary (Private Service)
-  # IMPORTANT: This service is NOT directly accessible from the public internet.
-  # It is isolated inside Render's private network and requires internal x-execution-secret verification.
-  - type: pserv
-    name: workproof-execution-service
-    runtime: node
-    plan: free
-    region: oregon
-    rootDir: execution-service
-    buildCommand: npm install && npm run build
-    startCommand: node dist/index.js
-    autoDeploy: true
-    envVars:
-      - key: PORT
-        value: 5003
-      - key: EXECUTION_SECRET
-        fromService:
-          type: web
-          name: workproof-backend
-          envVarKey: EXECUTION_SECRET

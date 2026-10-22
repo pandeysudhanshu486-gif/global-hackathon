@@ -107,7 +107,7 @@ const startServer = async () => {
   // Connect to Database
   await connectDatabase();
 
-  const server = app.listen(env.PORT, () => {
+  const server = app.listen(env.PORT, '0.0.0.0', () => {
     logger.info(`WorkProof AI Backend running on port ${env.PORT} [${env.NODE_ENV}]`);
     logger.info(`Health check available at: http://localhost:${env.PORT}/api/health`);
   });

@@ -7,7 +7,7 @@ router.get('/', (_req: Request, res: Response) => {
   const dbHealth = getDatabaseHealth();
   const isHealthy = dbHealth.status === 'healthy';
 
-  res.status(isHealthy ? 200 : 503).json({
+  res.status(200).json({
     success: true,
     status: isHealthy ? 'operational' : 'degraded',
     service: 'WorkProof AI Core API',

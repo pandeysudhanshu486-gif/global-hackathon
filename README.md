@@ -204,7 +204,7 @@ PORT=5002 npm test
 WorkProof AI is designed for secure, distributed cloud deployment:
 - **Frontend Client**: Deploy on [Vercel](https://vercel.com/) (React 19 + Vite SPA with `vercel.json` rewrites and `VITE_API_URL`).
 - **Core Backend API**: Deploy on [Render](https://render.com/) or Railway (Express + TypeScript Web Service with `/api/health`).
-- **Execution Boundary Service**: Deploy on [Render](https://render.com/) as a **Private Service (`type: pserv`)** isolated inside the internal network and secured with `x-execution-secret`.
+- **Execution Boundary**: Runs via isolated subprocess sandbox with ephemeral workspaces and 5s hard timeouts (built-in co-located for free tier; supports external private microservice if upgraded).
 - **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) (Managed M0 free-tier or dedicated cluster).
 
 ```
@@ -220,12 +220,12 @@ WorkProof AI is designed for secure, distributed cloud deployment:
 └───────────────────────┘       └───────────┬───────────┘
                                             │
                         ┌───────────────────┴───────────────────┐
-                        │ Internal Private VPC (No Public URL)  │
-                        ▼ (HTTP + x-execution-secret)           ▼ (TLS MONGODB_URI)
+                        │ Subprocess Sandbox (Temp Dir + 5s TO) │
+                        ▼ (Local spawn / Optional pserv)        ▼ (TLS MONGODB_URI)
             ┌───────────────────────┐               ┌───────────────────────┐
-            │  Render Private Svc   │               │     MongoDB Atlas     │
-            │  (workproof-execution)│               │    Database Cluster   │
-            │  Subprocess Sandbox   │               └───────────────────────┘
+            │  Isolated Child Proc  │               │     MongoDB Atlas     │
+            │  Execution Boundary   │               │    Database Cluster   │
+            │  (No Network Egress)  │               └───────────────────────┘
             └───────────────────────┘
 ```
 
@@ -237,21 +237,28 @@ WorkProof AI is designed for secure, distributed cloud deployment:
 3. Under **Database Access**, create a user with read/write permissions.
 4. Copy the connection string URI: `mongodb+srv://<username>:<password>@cluster0.mongodb.net/workproof-ai?retryWrites=true&w=majority`.
 
-#### Step 2: Deploy Backend & Execution Service on Render
-You can deploy both services in one click using the included [`render.yaml`](render.yaml) Blueprint:
+#### Step 2: Deploy Backend on Render
+You can deploy in one click using the included [`render.yaml`](render.yaml) Blueprint:
 
 1. Log into [Render Dashboard](https://dashboard.render.com/).
-2. Click **New +** → **Blueprint**.
+2. Click **New +** → **Blueprint** (or **New +** → **Web Service** if deploying manually).
 3. Connect your GitHub repository `pandeysudhanshu486-gif/global-hackathon`.
-4. Render will parse `render.yaml` and provision both:
-   - `workproof-backend` (Public Web Service)
-   - `workproof-execution-service` (Internal Private Service `type: pserv` — zero public exposure)
-5. Fill in the required environment variables prompted by the Blueprint:
+4. Render will parse `render.yaml` and provision `workproof-backend` (Web Service on the Free plan).
+   - If setting up manually as a Web Service:
+     - **Root Directory**: `backend`
+     - **Build Command**: `npm install --include=dev && npm run build`
+     - **Start Command**: `node dist/server.js`
+     - **Health Check Path**: `/api/health`
+5. Fill in the environment variables prompted by the Blueprint or in the Environment tab:
    - `MONGODB_URI`: Your MongoDB Atlas connection string from Step 1.
-   - `CORS_ORIGIN`: Your anticipated frontend domain (or `https://*.vercel.app`).
+   - `CORS_ORIGIN`: Your anticipated frontend domain (or `*` during initial testing).
+   - `JWT_ACCESS_SECRET`: Random 32+ character string (Blueprint auto-generates).
+   - `JWT_REFRESH_SECRET`: Random 32+ character string (Blueprint auto-generates).
+   - `EXECUTION_SECRET`: Random 32+ character string (Blueprint auto-generates).
+   - `EXECUTION_SERVICE_URL`: `http://localhost:5003` (defaults to internal sandboxed subprocess runner).
    - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API key.
    - `GITHUB_TOKEN`: *(Optional)* Your GitHub PAT for higher analysis rate limits.
-6. Click **Apply Blueprint**. Both services will build and start automatically.
+6. Click **Apply Blueprint** (or **Create Web Service**).
 7. Note down your backend URL (e.g. `https://workproof-backend.onrender.com`).
 8. Verify health check: `curl https://workproof-backend.onrender.com/api/health`.
 
@@ -294,7 +301,7 @@ You can deploy both services in one click using the included [`render.yaml`](ren
 | `JWT_ACCESS_EXPIRES_IN` | No | Access token expiration | `15m` |
 | `JWT_REFRESH_EXPIRES_IN` | No | Refresh token expiration | `7d` |
 | `EXECUTION_SECRET` | Yes | Internal shared secret to authorize execution requests | Shared key (min 32 chars) |
-| `EXECUTION_SERVICE_URL` | Yes | Internal URL to private execution boundary | `http://workproof-execution-service:5003` |
+| `EXECUTION_SERVICE_URL` | No | URL to execution boundary (defaults to co-located sandboxed subprocess runner) | `http://localhost:5003` |
 | `GEMINI_API_KEY` | No | Google Gemini API key for skill gap suggestions | `AIzaSy...` |
 | `GITHUB_TOKEN` | No | GitHub PAT for higher repo analyzer limits | `ghp_...` |
 
@@ -310,9 +317,11 @@ You can deploy both services in one click using the included [`render.yaml`](ren
 
 Untrusted candidate code execution poses critical security considerations. WorkProof AI enforces strict defenses:
 
-1. **Network Layer Isolation**: In production, `workproof-execution-service` runs as a Render **Private Service (`pserv`)**. It has no publicly routable hostname, preventing external ingress attacks. Only `workproof-backend` can contact it via Render's internal private overlay network.
-2. **Shared Secret Authentication**: Every execution request must provide `x-execution-secret` matching `EXECUTION_SECRET`. Unauthenticated requests are rejected immediately with 401.
-3. **Ephemeral Temp Workspaces**: Every job creates an isolated temporary directory via `fs.mkdtempSync()`, immediately stripped of parent environment variables (`HOME`, `PATH`, etc.).
+1. **Execution Isolation (Two Deployment Profiles)**:
+   - **Profile A (Free Tier Co-located Sandbox)**: When deployed on free hosting where private networking is unavailable, the backend invokes mission evaluation inside an isolated Node child process (`child_process.spawn`) with an ephemeral temporary directory (`fs.mkdtempSync`), stripped environment variables (`HOME: tempDir`, no secrets/JWT in env), path traversal guards, and a 5000ms hard timeout with `SIGKILL`. Zero public internet exposure.
+   - **Profile B (Dedicated Private Service)**: When deployed on paid plans supporting private networking (Render `type: pserv` or Railway private networking), the isolated execution service runs on a private internal VPC, accepting requests exclusively from the backend verified with `x-execution-secret`.
+2. **Shared Secret Authentication**: Every execution request across boundaries verifies `x-execution-secret` matching `EXECUTION_SECRET`.
+3. **Ephemeral Temp Workspaces**: Every job creates an isolated temporary directory via `fs.mkdtempSync()`, immediately stripped of parent environment variables.
 4. **Path Traversal Guards**: Filenames are strictly normalized and validated to prevent directory traversal (`../`, absolute paths).
 5. **Hard Process Timeouts & SIGKILL**: Subprocess execution is strictly capped (default 5000ms). If a script loops or hangs, it is forcibly terminated with `SIGKILL`.
 6. **Payload Size Caps**: JSON payloads and files are capped at 500KB per file and 2MB request body, preventing resource exhaustion (ReDoS/DoS).
