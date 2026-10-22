@@ -5,7 +5,7 @@ version: "1"
 services:
   # WorkProof AI Core API Service (Public Web Service)
   - type: web
-    name: workproof-backend
+    name: workproof-ai
     runtime: node
     plan: free
     region: oregon

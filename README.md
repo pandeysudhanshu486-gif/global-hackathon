@@ -216,7 +216,7 @@ WorkProof AI is designed for secure, distributed cloud deployment:
 ┌───────────────────────┐       ┌───────────────────────┐
 │     Vercel Edge       │       │    Render / Railway   │
 │   Frontend Client     │       │     Core API Web      │
-│ (workproof.vercel.app)│       │  (workproof-backend)  │
+│ (workproof.vercel.app)│       │    (workproof-ai)     │
 └───────────────────────┘       └───────────┬───────────┘
                                             │
                         ┌───────────────────┴───────────────────┐
@@ -243,42 +243,32 @@ You can deploy in one click using the included [`render.yaml`](render.yaml) Blue
 1. Log into [Render Dashboard](https://dashboard.render.com/).
 2. Click **New +** → **Blueprint** (or **New +** → **Web Service** if deploying manually).
 3. Connect your GitHub repository `pandeysudhanshu486-gif/global-hackathon`.
-4. Render will parse `render.yaml` and provision `workproof-backend` (Web Service on the Free plan).
+4. Render will parse `render.yaml` and provision `workproof-ai` (Web Service on the Free plan).
    - If setting up manually as a Web Service:
+     - **Name**: `workproof-ai`
      - **Root Directory**: `backend`
      - **Build Command**: `npm install --include=dev && npm run build`
      - **Start Command**: `node dist/server.js`
      - **Health Check Path**: `/api/health`
 5. Fill in the environment variables prompted by the Blueprint or in the Environment tab:
    - `MONGODB_URI`: Your MongoDB Atlas connection string from Step 1.
-   - `CORS_ORIGIN`: Your anticipated frontend domain (or `*` during initial testing).
+   - `CORS_ORIGIN`: `https://frontend-beige-one-37.vercel.app` (your verified live Vercel frontend URL).
    - `JWT_ACCESS_SECRET`: Random 32+ character string (Blueprint auto-generates).
    - `JWT_REFRESH_SECRET`: Random 32+ character string (Blueprint auto-generates).
    - `EXECUTION_SECRET`: Random 32+ character string (Blueprint auto-generates).
    - `EXECUTION_SERVICE_URL`: `http://localhost:5003` (defaults to internal sandboxed subprocess runner).
    - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API key.
    - `GITHUB_TOKEN`: *(Optional)* Your GitHub PAT for higher analysis rate limits.
-6. Click **Apply Blueprint** (or **Create Web Service**).
-7. Note down your backend URL (e.g. `https://workproof-backend.onrender.com`).
-8. Verify health check: `curl https://workproof-backend.onrender.com/api/health`.
+6. Click **Apply Blueprint** (or **Create Web Service** / **Resume Service** if suspended).
+7. Note down your backend URL: `https://workproof-ai.onrender.com`.
+8. Verify health check: `curl https://workproof-ai.onrender.com/api/health`.
 
-#### Step 3: Deploy Frontend on Vercel
-1. Log into [Vercel](https://vercel.com/) and click **Add New Project**.
-2. Import the `global-hackathon` repository.
-3. Configure project settings:
-   - **Framework Preset**: Vite
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `dist`
-4. Add the Environment Variable:
-   - `VITE_API_URL`: `https://workproof-backend.onrender.com` (your backend URL from Step 2, without trailing slash).
-5. Click **Deploy**. Vercel will build and deploy the client. SPA rewrites are automatically handled by [`frontend/vercel.json`](frontend/vercel.json).
-6. Copy your deployed frontend URL (e.g. `https://workproof-ai.vercel.app`).
+#### Step 3: Connect Frontend on Vercel
+The frontend is already deployed to Vercel at:
+**`https://frontend-beige-one-37.vercel.app`**
 
-#### Step 4: Finalize Backend CORS Origin
-1. Return to the Render Dashboard → `workproof-backend` → **Environment**.
-2. Set `CORS_ORIGIN` to your exact Vercel frontend URL: `https://workproof-ai.vercel.app`.
-3. Save changes. Render will automatically redeploy the backend with the updated CORS policy.
+To connect it to your live backend:
+- Add environment variable `VITE_API_URL` set to `https://workproof-ai.onrender.com`.
 
 ---
 
@@ -287,7 +277,7 @@ You can deploy in one click using the included [`render.yaml`](render.yaml) Blue
 #### Frontend (`frontend/.env`)
 | Variable | Description | Example / Default |
 |:---|:---|:---|
-| `VITE_API_URL` | Cloud backend API base URL (empty in local dev to use Vite proxy) | `https://workproof-backend.onrender.com` |
+| `VITE_API_URL` | Cloud backend API base URL | `https://workproof-ai.onrender.com` |
 
 #### Backend Core API (`backend/.env`)
 | Variable | Required | Description | Example / Default |
