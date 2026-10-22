@@ -13,6 +13,9 @@
     "test": "NODE_ENV=test tsx src/tests/profile.test.ts && NODE_ENV=test tsx src/tests/resume.test.ts && NODE_ENV=test tsx src/tests/github.test.ts && NODE_ENV=test tsx src/tests/skill-gap.test.ts && NODE_ENV=test tsx src/tests/mission-execution.test.ts && NODE_ENV=test tsx src/tests/evaluation.test.ts && NODE_ENV=test tsx src/tests/recruiter.test.ts && NODE_ENV=test tsx src/tests/passport.test.ts && NODE_ENV=test tsx src/tests/opportunity.test.ts"
   },
   "keywords": ["skills-first", "verification", "hiring-signal", "workproof"],
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "author": "WorkProof AI Team",
   "license": "ISC",
   "dependencies": {
