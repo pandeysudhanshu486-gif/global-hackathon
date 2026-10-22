@@ -38,11 +38,44 @@ export const createApp = (): Express => {
       origin: (origin, callback) => {
         // Allow requests with no origin (like mobile apps, curl, or same-origin)
         if (!origin) return callback(null, true);
-        const allowed = [env.CORS_ORIGIN, 'http://localhost:5173', 'http://127.0.0.1:5173'];
-        if (allowed.includes(origin) || /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/.test(origin)) {
+
+        const configuredOrigins = env.CORS_ORIGIN
+          ? env.CORS_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean)
+          : [];
+
+        const allowed = [
+          ...configuredOrigins,
+          'http://localhost:5173',
+          'http://127.0.0.1:5173',
+        ];
+
+        // Exact match
+        if (allowed.includes(origin) || allowed.includes('*')) {
           return callback(null, true);
         }
-        return callback(null, true); // Dev-friendly fallback
+
+        // Allow Vercel preview URLs if configured origin is a vercel.app domain
+        if (
+          configuredOrigins.some((co) => co.includes('vercel.app')) &&
+          /^https:\/\/[a-z0-9-]+(\.vercel\.app)$/.test(origin)
+        ) {
+          return callback(null, true);
+        }
+
+        // Local development subnet / loopback regex
+        if (
+          env.NODE_ENV !== 'production' &&
+          /^http:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+)(:\d+)?$/.test(origin)
+        ) {
+          return callback(null, true);
+        }
+
+        // In production, reject unauthorized origins
+        if (env.NODE_ENV === 'production') {
+          return callback(new Error(`CORS origin not allowed: ${origin}`));
+        }
+
+        return callback(null, true);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],

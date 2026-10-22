@@ -14,14 +14,15 @@ export const connectDatabase = async (): Promise<boolean> => {
     
     // Connect to MongoDB
     await mongoose.connect(env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000,
     });
 
     isConnected = true;
     logger.info(`MongoDB connected successfully to ${mongoose.connection.host}/${mongoose.connection.name}`);
 
     mongoose.connection.on('error', (err) => {
-      logger.error('MongoDB connection error:', err);
+      const sanitizedErr = (err instanceof Error ? err.message : String(err)).replace(/:([^@/]+)@/, ':***@');
+      logger.error('MongoDB connection error:', sanitizedErr);
       isConnected = false;
     });
 
@@ -33,7 +34,8 @@ export const connectDatabase = async (): Promise<boolean> => {
     return true;
   } catch (error) {
     isConnected = false;
-    logger.warn(`MongoDB initial connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const sanitizedMsg = (error instanceof Error ? error.message : 'Unknown error').replace(/:([^@/]+)@/, ':***@');
+    logger.warn(`MongoDB initial connection failed: ${sanitizedMsg}`);
     logger.info('Running in offline/unconnected DB mode. Health check will report DB status.');
     return false;
   }
