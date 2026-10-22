@@ -8,7 +8,7 @@ const isProduction = process.env.NODE_ENV === 'production';
 const envSchema = z.object({
   PORT: z.string().default('5002').transform((val) => parseInt(val, 10)),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  CORS_ORIGIN: z.string().default('http://localhost:5173'),
+  CORS_ORIGIN: z.string().default('http://localhost:5173,https://frontend-beige-one-37.vercel.app'),
   MONGODB_URI: z.string().default('mongodb://127.0.0.1:27017/workproof-ai'),
   // In production, secrets MUST be explicitly provided by the hosting environment.
   // In development/test, fallback defaults are permitted for local developer convenience.

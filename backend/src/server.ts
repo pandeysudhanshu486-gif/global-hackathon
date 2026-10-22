@@ -47,6 +47,7 @@ export const createApp = (): Express => {
           ...configuredOrigins,
           'http://localhost:5173',
           'http://127.0.0.1:5173',
+          'https://frontend-beige-one-37.vercel.app',
         ];
 
         // Exact match
@@ -54,11 +55,8 @@ export const createApp = (): Express => {
           return callback(null, true);
         }
 
-        // Allow Vercel preview URLs if configured origin is a vercel.app domain
-        if (
-          configuredOrigins.some((co) => co.includes('vercel.app')) &&
-          /^https:\/\/[a-z0-9-]+(\.vercel\.app)$/.test(origin)
-        ) {
+        // Allow any Vercel deployment URL (production, preview branches)
+        if (/^https:\/\/[a-z0-9-]+(\.vercel\.app)$/.test(origin)) {
           return callback(null, true);
         }
 
@@ -70,12 +68,8 @@ export const createApp = (): Express => {
           return callback(null, true);
         }
 
-        // In production, reject unauthorized origins
-        if (env.NODE_ENV === 'production') {
-          return callback(new Error(`CORS origin not allowed: ${origin}`));
-        }
-
-        return callback(null, true);
+        // Reject unauthorized origins cleanly without crashing Express
+        return callback(null, false);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
