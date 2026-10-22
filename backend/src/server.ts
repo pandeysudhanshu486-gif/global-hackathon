@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import { env } from './config/env.js';
@@ -35,7 +35,7 @@ export const createApp = (): Express => {
   app.use(helmet());
   app.use(
     cors({
-      origin: (origin, callback) => {
+      origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
         // Allow requests with no origin (like mobile apps, curl, or same-origin)
         if (!origin) return callback(null, true);
 
@@ -91,7 +91,7 @@ export const createApp = (): Express => {
   app.use('/api', globalRateLimiter);
 
   // Request Logging
-  app.use((req, _res, next) => {
+  app.use((req: Request, _res: Response, next: NextFunction) => {
     logger.debug(`${req.method} ${req.path}`);
     next();
   });
@@ -119,7 +119,7 @@ export const createApp = (): Express => {
   app.use('/api/github', githubRouter);
 
   // 404 Handler
-  app.use((req, res) => {
+  app.use((req: Request, res: Response) => {
     res.status(404).json({
       success: false,
       error: {

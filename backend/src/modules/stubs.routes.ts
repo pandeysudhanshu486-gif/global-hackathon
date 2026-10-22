@@ -1,37 +1,37 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 
-export const skillRouter = Router().get('/roles', (_req, res) => {
+export const skillRouter = Router().get('/roles', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Skill module foundation ready' });
 });
 
-export const missionRouter = Router().get('/', (_req, res) => {
+export const missionRouter = Router().get('/', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Mission module foundation ready' });
 });
 
-export const simulatorRouter = Router().get('/health', (_req, res) => {
+export const simulatorRouter = Router().get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Simulator module foundation ready' });
 });
 
-export const evaluationRouter = Router().get('/health', (_req, res) => {
+export const evaluationRouter = Router().get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Evaluation module foundation ready' });
 });
 
-export const evidenceRouter = Router().get('/health', (_req, res) => {
+export const evidenceRouter = Router().get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Evidence module foundation ready' });
 });
 
-export const passportRouter = Router().get('/public/:slug', (_req, res) => {
+export const passportRouter = Router().get('/public/:slug', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Passport module foundation ready' });
 });
 
-export const discoveryRouter = Router().get('/opportunities', (_req, res) => {
+export const discoveryRouter = Router().get('/opportunities', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Discovery module foundation ready' });
 });
 
-export const recruiterRouter = Router().get('/health', (_req, res) => {
+export const recruiterRouter = Router().get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'Recruiter module foundation ready' });
 });
 
-export const githubRouter = Router().get('/health', (_req, res) => {
+export const githubRouter = Router().get('/health', (_req: Request, res: Response) => {
   res.status(200).json({ success: true, message: 'GitHub module foundation ready' });
 });
