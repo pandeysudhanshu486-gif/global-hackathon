@@ -1,8 +1,11 @@
 import assert from 'assert';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { env } from '../config/env.js';
 import { PassportService } from '../modules/passport/passport.service.js';
 import { updatePassportSettingsSchema } from '../modules/passport/passport.validation.js';
+import { StudentProfileModel } from '../models/studentProfile.model.js';
+import { PassportModel } from '../models/passport.model.js';
 
 const API_BASE = `http://localhost:${env.PORT || 5002}`;
 
@@ -19,6 +22,108 @@ async function runTests() {
   const student2Id = '650000000000000000000002';
   const student1Token = generateTestToken(student1Id, 'alex.chen@test.com', 'student');
   const student2Token = generateTestToken(student2Id, 'sarah.j@test.com', 'student');
+
+  // Test Fixture: Ensure student profiles and passports exist in MongoDB
+  if (mongoose.connection.readyState === 0) {
+    await mongoose.connect(env.MONGODB_URI);
+  }
+
+  // Seed / ensure StudentProfile for student 1 (Alex Chen)
+  let p1 = await StudentProfileModel.findOne({ userId: new mongoose.Types.ObjectId(student1Id) });
+  if (!p1) {
+    p1 = await StudentProfileModel.create({
+      userId: new mongoose.Types.ObjectId(student1Id),
+      name: 'Alex Chen',
+      targetRole: 'backend-developer',
+      bio: 'Backend engineer focused on distributed systems and APIs.',
+      education: [{ institution: 'UC Berkeley', degree: 'B.S. Computer Science', graduationYear: 2024 }],
+      projects: [
+        {
+          title: 'Order Flow Engine',
+          description: 'High-throughput async transaction processing',
+          technologies: ['Node.js', 'TypeScript'],
+          githubUrl: 'https://github.com/alexchen-dev/order-engine',
+        },
+      ],
+      declaredSkills: [
+        { name: 'Node.js', category: 'backend', selfAssessedLevel: 'advanced' },
+        { name: 'TypeScript', category: 'backend', selfAssessedLevel: 'intermediate' },
+      ],
+      githubConnected: true,
+      githubUsername: 'alexchen-dev',
+      githubProfileUrl: 'https://github.com/alexchen-dev',
+      resumeParsedData: {
+        extractedSkills: [{ name: 'JavaScript' }, { name: 'Express' }],
+        extractionMethod: 'heuristic_fallback',
+        parsedAt: new Date(),
+        verified: false,
+      },
+      interests: [],
+    });
+  } else {
+    p1.education = [{ institution: 'UC Berkeley', degree: 'B.S. Computer Science', graduationYear: 2024 }];
+    p1.projects = [
+      {
+        title: 'Order Flow Engine',
+        description: 'High-throughput async transaction processing',
+        technologies: ['Node.js', 'TypeScript'],
+        githubUrl: 'https://github.com/alexchen-dev/order-engine',
+      },
+    ];
+    p1.githubConnected = true;
+    p1.githubUsername = 'alexchen-dev';
+    p1.resumeParsedData = {
+      extractedSkills: [{ name: 'JavaScript' }, { name: 'Express' }],
+      extractionMethod: 'heuristic_fallback',
+      parsedAt: new Date(),
+      verified: false,
+      extractedExperience: [],
+      extractedEducation: [],
+      extractedProjects: [],
+      extractedCertifications: [],
+    };
+    await p1.save();
+  }
+
+  await PassportModel.findOneAndUpdate(
+    { studentId: p1._id },
+    {
+      studentId: p1._id,
+      publicSlug: 'alex-chen-wk7a',
+      visibility: 'public',
+      privacySettings: PassportService.defaultPrivacySettings,
+      stats: { missionsCompleted: 1, totalEvidenceRecords: 3, skillsWithEvidence: 3 },
+      lastUpdatedAt: new Date(),
+    },
+    { upsert: true, new: true }
+  );
+
+  // Seed / ensure StudentProfile for student 2 (Sarah Jenkins)
+  let p2 = await StudentProfileModel.findOne({ userId: new mongoose.Types.ObjectId(student2Id) });
+  if (!p2) {
+    p2 = await StudentProfileModel.create({
+      userId: new mongoose.Types.ObjectId(student2Id),
+      name: 'Sarah Jenkins',
+      targetRole: 'frontend-developer',
+      education: [{ institution: 'NYU', degree: 'B.S. Information Systems', graduationYear: 2025 }],
+      projects: [],
+      declaredSkills: [{ name: 'React', category: 'frontend', selfAssessedLevel: 'advanced' }],
+      interests: [],
+    });
+  }
+
+  await PassportModel.findOneAndUpdate(
+    { studentId: p2._id },
+    {
+      studentId: p2._id,
+      publicSlug: 'sarah-jenkins-xk9b',
+      visibility: 'public',
+      privacySettings: PassportService.defaultPrivacySettings,
+      stats: { missionsCompleted: 0, totalEvidenceRecords: 0, skillsWithEvidence: 0 },
+      lastUpdatedAt: new Date(),
+    },
+    { upsert: true, new: true }
+  );
 
   // Test 1: Valid public passport loads without authentication
   try {
@@ -377,6 +482,16 @@ async function runTests() {
   }
 
   console.log(`\nMilestone 6 Phase 3 Passport Tests Summary: ${passedCount}/${totalCount} passed`);
+
+  // Cleanup: restore default settings and close connection
+  if (mongoose.connection.readyState === 1) {
+    await PassportModel.updateOne(
+      { publicSlug: 'alex-chen-wk7a' },
+      { privacySettings: PassportService.defaultPrivacySettings, visibility: 'public' }
+    );
+    await mongoose.disconnect();
+  }
+
   if (passedCount !== totalCount) {
     process.exit(1);
   }

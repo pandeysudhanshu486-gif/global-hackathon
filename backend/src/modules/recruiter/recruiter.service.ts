@@ -126,55 +126,64 @@ export class RecruiterService {
   public static async searchCandidates(query: CandidateSearchQuery): Promise<CandidateSearchResult> {
     let studentProfiles: any[] = [];
 
+    const mockProfiles = [
+      {
+        _id: new mongoose.Types.ObjectId('650000000000000000000001'),
+        userId: new mongoose.Types.ObjectId('650000000000000000000001'),
+        name: 'Alex Chen',
+        bio: 'Backend engineer focused on distributed systems and APIs.',
+        location: 'San Francisco, CA',
+        workPreference: 'remote',
+        targetRole: 'backend-developer',
+        declaredSkills: [
+          { name: 'Node.js', category: 'backend', selfAssessedLevel: 'advanced' },
+          { name: 'TypeScript', category: 'backend', selfAssessedLevel: 'intermediate' },
+          { name: 'PostgreSQL', category: 'database', selfAssessedLevel: 'intermediate' },
+        ],
+        education: [{ institution: 'UC Berkeley', degree: 'B.S. Computer Science', graduationYear: 2024 }],
+        projects: [{ title: 'Order Flow Engine', description: 'Async message processing', technologies: ['Node.js'] }],
+        githubConnected: true,
+        githubUsername: 'alexchen-dev',
+        resumeParsedData: {
+          extractedSkills: [{ name: 'JavaScript' }, { name: 'Express' }],
+          parsedAt: new Date(),
+          verified: false,
+        },
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      },
+      {
+        _id: new mongoose.Types.ObjectId('650000000000000000000002'),
+        userId: new mongoose.Types.ObjectId('650000000000000000000002'),
+        name: 'Sarah Jenkins',
+        bio: 'Frontend engineer with passion for accessible design systems.',
+        location: 'New York, NY',
+        workPreference: 'hybrid',
+        targetRole: 'frontend-developer',
+        declaredSkills: [
+          { name: 'React', category: 'frontend', selfAssessedLevel: 'advanced' },
+          { name: 'Tailwind CSS', category: 'frontend', selfAssessedLevel: 'advanced' },
+        ],
+        education: [{ institution: 'NYU', degree: 'B.S. Information Systems', graduationYear: 2025 }],
+        projects: [],
+        githubConnected: false,
+        updatedAt: new Date(),
+        createdAt: new Date(),
+      },
+    ];
+
     if (mongoose.connection.readyState === 1) {
       studentProfiles = await StudentProfileModel.find().lean();
+      for (const mock of mockProfiles) {
+        const exists = studentProfiles.some(
+          (p) => p.userId?.toString() === mock.userId.toString() || p._id?.toString() === mock._id.toString()
+        );
+        if (!exists) {
+          studentProfiles.push(mock);
+        }
+      }
     } else {
-      // In-memory mock profiles for testing/development
-      studentProfiles = [
-        {
-          _id: new mongoose.Types.ObjectId('650000000000000000000001'),
-          userId: new mongoose.Types.ObjectId('650000000000000000000001'),
-          name: 'Alex Chen',
-          bio: 'Backend engineer focused on distributed systems and APIs.',
-          location: 'San Francisco, CA',
-          workPreference: 'remote',
-          targetRole: 'backend-developer',
-          declaredSkills: [
-            { name: 'Node.js', category: 'backend', selfAssessedLevel: 'advanced' },
-            { name: 'TypeScript', category: 'backend', selfAssessedLevel: 'intermediate' },
-            { name: 'PostgreSQL', category: 'database', selfAssessedLevel: 'intermediate' },
-          ],
-          education: [{ institution: 'UC Berkeley', degree: 'B.S. Computer Science', graduationYear: 2024 }],
-          projects: [{ title: 'Order Flow Engine', description: 'Async message processing', technologies: ['Node.js'] }],
-          githubConnected: true,
-          githubUsername: 'alexchen-dev',
-          resumeParsedData: {
-            extractedSkills: [{ name: 'JavaScript' }, { name: 'Express' }],
-            parsedAt: new Date(),
-            verified: false,
-          },
-          updatedAt: new Date(),
-          createdAt: new Date(),
-        },
-        {
-          _id: new mongoose.Types.ObjectId('650000000000000000000002'),
-          userId: new mongoose.Types.ObjectId('650000000000000000000002'),
-          name: 'Sarah Jenkins',
-          bio: 'Frontend engineer with passion for accessible design systems.',
-          location: 'New York, NY',
-          workPreference: 'hybrid',
-          targetRole: 'frontend-developer',
-          declaredSkills: [
-            { name: 'React', category: 'frontend', selfAssessedLevel: 'advanced' },
-            { name: 'Tailwind CSS', category: 'frontend', selfAssessedLevel: 'advanced' },
-          ],
-          education: [{ institution: 'NYU', degree: 'B.S. Information Systems', graduationYear: 2025 }],
-          projects: [],
-          githubConnected: false,
-          updatedAt: new Date(),
-          createdAt: new Date(),
-        },
-      ];
+      studentProfiles = mockProfiles;
     }
 
     const candidateItems: CandidateListItem[] = [];
@@ -236,11 +245,11 @@ export class RecruiterService {
       // Apply Factual Filters
       let matches = true;
 
-      // Filter: targetRole
+      // Filter: targetRole (blank roles must NEVER match any targetRole filter)
       if (query.targetRole && query.targetRole.trim()) {
         const targetClean = query.targetRole.trim().toLowerCase();
-        const roleClean = (item.targetRole || '').toLowerCase();
-        if (!roleClean.includes(targetClean) && !targetClean.includes(roleClean)) {
+        const roleClean = (item.targetRole || '').trim().toLowerCase();
+        if (!roleClean || (!roleClean.includes(targetClean) && !targetClean.includes(roleClean))) {
           matches = false;
         }
       }

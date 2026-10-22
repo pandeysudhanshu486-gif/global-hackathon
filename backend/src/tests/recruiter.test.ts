@@ -13,7 +13,7 @@ const generateTestToken = (userId: string, email: string, role: 'student' | 'rec
 async function runTests() {
   console.log('--- Starting Milestone 6 Phase 1 Recruiter Backend Tests ---');
   let passedCount = 0;
-  const totalCount = 14;
+  const totalCount = 15;
 
   const studentToken = generateTestToken('650000000000000000000001', 'alex.chen@test.com', 'student');
   const student2Token = generateTestToken('650000000000000000000002', 'sarah.j@test.com', 'student');
@@ -272,6 +272,29 @@ async function runTests() {
     console.log('  ✓ Evidence Invariant: GitHub & Resume data strictly cannot create Demonstrated capability');
   } catch (err: any) {
     console.error('  ✗ Evidence Invariant test failed:', err.message);
+  }
+
+  // Test 15: Regression Test: Candidates with blank or missing targetRole never match a specific targetRole filter
+  try {
+    const res = await fetch(`${API_BASE}/api/recruiter/candidates?targetRole=backend-developer`, {
+      headers: { Authorization: `Bearer ${recruiterToken}` },
+    });
+    assert.strictEqual(res.status, 200);
+    const body = await res.json();
+    for (const c of body.data.candidates) {
+      assert.ok(
+        c.targetRole && c.targetRole.trim().length > 0,
+        `Candidate ${c.name} with blank targetRole was erroneously returned`
+      );
+      assert.ok(
+        c.targetRole.toLowerCase().includes('backend'),
+        `Candidate ${c.name} does not match backend targetRole filter`
+      );
+    }
+    passedCount++;
+    console.log('  ✓ Regression: Candidates with blank targetRole are excluded from targetRole search');
+  } catch (err: any) {
+    console.error('  ✗ Blank targetRole regression test failed:', err.message);
   }
 
   console.log(`\nMilestone 6 Recruiter Tests Summary: ${passedCount}/${totalCount} passed`);
