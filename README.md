@@ -133,8 +133,8 @@ WorkProof AI uses a defense-in-depth, three-tier modular architecture:
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/pandeysudhanshu486-gif/workproof-ai.git
-cd workproof-ai
+git clone https://github.com/pandeysudhanshu486-gif/global-hackathon.git
+cd global-hackathon/workproof-ai
 ```
 
 ### 2. Configure Environment Variables
@@ -185,13 +185,137 @@ cd backend
 PORT=5002 npm test
 ```
 
-### Verification Matrix:
-- ✅ **Profile Validation & RBAC**: 6/6 tests passed (schema enforcement, role guards).
-- ✅ **Resume Parsing & AI Fallback**: 12/12 tests passed (magic bytes check, Gemini fallback).
+### Verification Matrix (103/103 Tests Passing):
+- ✅ **Profile Validation & RBAC**: 6/6 tests passed (schema enforcement, role guards, profile persistence).
+- ✅ **Resume Parsing & AI Fallback**: 12/12 tests passed (magic bytes check, Gemini fallback, size guards).
 - ✅ **GitHub Analyzer**: 13/13 tests passed (repo extraction, tenant isolation, SHA-256 evidence).
-- ✅ **Skill Gap & Recommendation Engine**: 12/12 tests passed (role mapping, priority gaps).
-- ✅ **Work Simulator & Execution Boundary**: 14/15 tests passed (sandboxed runner, assertion checks).
-- ✅ **Frontend Production Build**: `tsc -b && vite build` built with **0 errors**.
+- ✅ **Skill Gap & Recommendation Engine**: 12/12 tests passed (role mapping, priority gaps, capability rubrics).
+- ✅ **Work Simulator & Execution Boundary**: 15/15 tests passed (sandboxed runner, assertion checks, timeout kill).
+- ✅ **Evaluation Engine**: 12/12 tests passed (immediate & manual evaluation, SHA-256 proof receipts).
+- ✅ **Recruiter Workflow & Candidate Search**: 11/11 tests passed (strict role filters, target-role whitespace guard, dossiers).
+- ✅ **Proof Passport & Privacy Controls**: 11/11 tests passed (public slug resolution, privacy toggles, zero token leaks).
+- ✅ **Opportunity & Application Matching**: 11/11 tests passed (evidence verification checks, role matching).
+- ✅ **TypeScript & Production Builds**: All 3 services (`frontend`, `backend`, `execution-service`) compile with **0 errors**.
+
+---
+
+## 🌐 Production Cloud Deployment Guide
+
+WorkProof AI is designed for secure, distributed cloud deployment:
+- **Frontend Client**: Deploy on [Vercel](https://vercel.com/) (React 19 + Vite SPA with `vercel.json` rewrites and `VITE_API_URL`).
+- **Core Backend API**: Deploy on [Render](https://render.com/) or Railway (Express + TypeScript Web Service with `/api/health`).
+- **Execution Boundary Service**: Deploy on [Render](https://render.com/) as a **Private Service (`type: pserv`)** isolated inside the internal network and secured with `x-execution-secret`.
+- **Database**: [MongoDB Atlas](https://www.mongodb.com/atlas) (Managed M0 free-tier or dedicated cluster).
+
+```
+                      INTERNET
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+        ▼ (HTTPS)                         ▼ (HTTPS /api/*)
+┌───────────────────────┐       ┌───────────────────────┐
+│     Vercel Edge       │       │    Render / Railway   │
+│   Frontend Client     │       │     Core API Web      │
+│ (workproof.vercel.app)│       │  (workproof-backend)  │
+└───────────────────────┘       └───────────┬───────────┘
+                                            │
+                        ┌───────────────────┴───────────────────┐
+                        │ Internal Private VPC (No Public URL)  │
+                        ▼ (HTTP + x-execution-secret)           ▼ (TLS MONGODB_URI)
+            ┌───────────────────────┐               ┌───────────────────────┐
+            │  Render Private Svc   │               │     MongoDB Atlas     │
+            │  (workproof-execution)│               │    Database Cluster   │
+            │  Subprocess Sandbox   │               └───────────────────────┘
+            └───────────────────────┘
+```
+
+### Deployment Order & Step-by-Step Instructions
+
+#### Step 1: Set Up MongoDB Atlas
+1. Create a free shared cluster at [mongodb.com/atlas](https://www.mongodb.com/atlas).
+2. Under **Network Access**, add `0.0.0.0/0` (or Render's outbound IP ranges).
+3. Under **Database Access**, create a user with read/write permissions.
+4. Copy the connection string URI: `mongodb+srv://<username>:<password>@cluster0.mongodb.net/workproof-ai?retryWrites=true&w=majority`.
+
+#### Step 2: Deploy Backend & Execution Service on Render
+You can deploy both services in one click using the included [`render.yaml`](render.yaml) Blueprint:
+
+1. Log into [Render Dashboard](https://dashboard.render.com/).
+2. Click **New +** → **Blueprint**.
+3. Connect your GitHub repository `pandeysudhanshu486-gif/global-hackathon`.
+4. Render will parse `render.yaml` and provision both:
+   - `workproof-backend` (Public Web Service)
+   - `workproof-execution-service` (Internal Private Service `type: pserv` — zero public exposure)
+5. Fill in the required environment variables prompted by the Blueprint:
+   - `MONGODB_URI`: Your MongoDB Atlas connection string from Step 1.
+   - `CORS_ORIGIN`: Your anticipated frontend domain (or `https://*.vercel.app`).
+   - `GEMINI_API_KEY`: *(Optional)* Your Google Gemini API key.
+   - `GITHUB_TOKEN`: *(Optional)* Your GitHub PAT for higher analysis rate limits.
+6. Click **Apply Blueprint**. Both services will build and start automatically.
+7. Note down your backend URL (e.g. `https://workproof-backend.onrender.com`).
+8. Verify health check: `curl https://workproof-backend.onrender.com/api/health`.
+
+#### Step 3: Deploy Frontend on Vercel
+1. Log into [Vercel](https://vercel.com/) and click **Add New Project**.
+2. Import the `global-hackathon` repository.
+3. Configure project settings:
+   - **Framework Preset**: Vite
+   - **Root Directory**: `frontend`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Add the Environment Variable:
+   - `VITE_API_URL`: `https://workproof-backend.onrender.com` (your backend URL from Step 2, without trailing slash).
+5. Click **Deploy**. Vercel will build and deploy the client. SPA rewrites are automatically handled by [`frontend/vercel.json`](frontend/vercel.json).
+6. Copy your deployed frontend URL (e.g. `https://workproof-ai.vercel.app`).
+
+#### Step 4: Finalize Backend CORS Origin
+1. Return to the Render Dashboard → `workproof-backend` → **Environment**.
+2. Set `CORS_ORIGIN` to your exact Vercel frontend URL: `https://workproof-ai.vercel.app`.
+3. Save changes. Render will automatically redeploy the backend with the updated CORS policy.
+
+---
+
+### Environment Variables Reference
+
+#### Frontend (`frontend/.env`)
+| Variable | Description | Example / Default |
+|:---|:---|:---|
+| `VITE_API_URL` | Cloud backend API base URL (empty in local dev to use Vite proxy) | `https://workproof-backend.onrender.com` |
+
+#### Backend Core API (`backend/.env`)
+| Variable | Required | Description | Example / Default |
+|:---|:---:|:---|:---|
+| `PORT` | Yes | HTTP port (Render assigns dynamically) | `10000` |
+| `NODE_ENV` | Yes | Environment mode | `production` |
+| `CORS_ORIGIN` | Yes | Allowed frontend origin for CORS credentials | `https://workproof-ai.vercel.app` |
+| `MONGODB_URI` | Yes | MongoDB Atlas connection string | `mongodb+srv://user:pass@cluster.mongodb.net/workproof-ai` |
+| `JWT_ACCESS_SECRET` | Yes | Secret for signing 15m access tokens (min 32 chars) | `openssl rand -hex 32` |
+| `JWT_REFRESH_SECRET` | Yes | Secret for signing 7d refresh tokens (min 32 chars) | `openssl rand -hex 32` |
+| `JWT_ACCESS_EXPIRES_IN` | No | Access token expiration | `15m` |
+| `JWT_REFRESH_EXPIRES_IN` | No | Refresh token expiration | `7d` |
+| `EXECUTION_SECRET` | Yes | Internal shared secret to authorize execution requests | Shared key (min 32 chars) |
+| `EXECUTION_SERVICE_URL` | Yes | Internal URL to private execution boundary | `http://workproof-execution-service:5003` |
+| `GEMINI_API_KEY` | No | Google Gemini API key for skill gap suggestions | `AIzaSy...` |
+| `GITHUB_TOKEN` | No | GitHub PAT for higher repo analyzer limits | `ghp_...` |
+
+#### Execution Service (`execution-service/.env`)
+| Variable | Required | Description | Example / Default |
+|:---|:---:|:---|:---|
+| `PORT` | Yes | Internal service port | `5003` |
+| `EXECUTION_SECRET` | Yes | Internal shared secret verifying calls from backend | Same secret as backend `EXECUTION_SECRET` |
+
+---
+
+### 🔒 Execution Boundary Security & Sandboxing Audit
+
+Untrusted candidate code execution poses critical security considerations. WorkProof AI enforces strict defenses:
+
+1. **Network Layer Isolation**: In production, `workproof-execution-service` runs as a Render **Private Service (`pserv`)**. It has no publicly routable hostname, preventing external ingress attacks. Only `workproof-backend` can contact it via Render's internal private overlay network.
+2. **Shared Secret Authentication**: Every execution request must provide `x-execution-secret` matching `EXECUTION_SECRET`. Unauthenticated requests are rejected immediately with 401.
+3. **Ephemeral Temp Workspaces**: Every job creates an isolated temporary directory via `fs.mkdtempSync()`, immediately stripped of parent environment variables (`HOME`, `PATH`, etc.).
+4. **Path Traversal Guards**: Filenames are strictly normalized and validated to prevent directory traversal (`../`, absolute paths).
+5. **Hard Process Timeouts & SIGKILL**: Subprocess execution is strictly capped (default 5000ms). If a script loops or hangs, it is forcibly terminated with `SIGKILL`.
+6. **Payload Size Caps**: JSON payloads and files are capped at 500KB per file and 2MB request body, preventing resource exhaustion (ReDoS/DoS).
 
 ---
 

@@ -11,6 +11,7 @@ import { CapabilityCard } from '../components/skill-gap/CapabilityCard';
 import { PageExplainerCard } from '../components/guidance/PageExplainerCard';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
+import { apiUrl } from '../utils/api';
 import type {
   SkillGapAnalysisData,
   RoleListItem,
@@ -34,7 +35,7 @@ export const SkillGapPage: React.FC<SkillGapPageProps> = ({ onNavigateToMission,
   // Fetch available roles
   const fetchRoles = async () => {
     try {
-      const res = await fetch('/api/skills/roles');
+      const res = await fetch(apiUrl('/api/skills/roles'));
       if (res.ok) {
         const body = await res.json();
         if (body.success && Array.isArray(body.data)) {

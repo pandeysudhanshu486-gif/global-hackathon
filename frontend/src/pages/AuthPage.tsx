@@ -4,6 +4,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Card, CardHeader, CardContent } from '../components/ui/Card';
 import { setAuthSession } from '../utils/auth';
+import { apiUrl } from '../utils/api';
 
 export interface AuthPageProps {
   initialMode?: 'login' | 'register';
@@ -32,7 +33,7 @@ export const AuthPage: React.FC<AuthPageProps> = ({ initialMode = 'login', onAut
           ? { email, password }
           : { email, password, name, role, ...(role === 'recruiter' && { companyName }) };
 
-      const response = await fetch(endpoint, {
+      const response = await fetch(apiUrl(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

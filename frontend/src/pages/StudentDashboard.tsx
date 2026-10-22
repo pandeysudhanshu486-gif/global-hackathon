@@ -13,6 +13,7 @@ import { Button } from '../components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { EvidenceLevelIndicator } from '../components/ui/EvidenceLevelIndicator';
 import { authFetch } from '../utils/auth';
+import { apiUrl } from '../utils/api';
 import { VisualJourneyBar } from '../components/guidance/VisualJourneyBar';
 import { WhyWorkProofComparison } from '../components/guidance/WhyWorkProofComparison';
 
@@ -35,7 +36,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
   useEffect(() => {
     // Fetch live system health status
-    fetch('/api/health')
+    fetch(apiUrl('/api/health'))
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {

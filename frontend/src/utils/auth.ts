@@ -3,6 +3,8 @@
  * Centralized, canonical token lifecycle, session recovery, and API authentication.
  */
 
+import { apiUrl } from './api';
+
 export interface StoredUser {
   id: string;
   name: string;
@@ -97,7 +99,7 @@ export const refreshAuthSession = async (): Promise<string | null> => {
 
   activeRefreshPromise = (async () => {
     try {
-      const res = await fetch('/api/auth/refresh', {
+      const res = await fetch(apiUrl('/api/auth/refresh'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken }),
@@ -138,6 +140,7 @@ export const authFetch = async (
   init?: RequestInit
 ): Promise<Response> => {
   const token = getAuthToken();
+  const resolvedInput = typeof input === 'string' ? apiUrl(input) : input;
 
   const prepareHeaders = (currentToken: string): Headers => {
     const isFormData = typeof FormData !== 'undefined' && init?.body instanceof FormData;
@@ -153,7 +156,7 @@ export const authFetch = async (
     return headers;
   };
 
-  let response = await fetch(input, {
+  let response = await fetch(resolvedInput, {
     ...init,
     headers: prepareHeaders(token),
   });
@@ -163,7 +166,7 @@ export const authFetch = async (
     const refreshedToken = await refreshAuthSession();
     if (refreshedToken) {
       // Retry original request once with fresh access token
-      response = await fetch(input, {
+      response = await fetch(resolvedInput, {
         ...init,
         headers: prepareHeaders(refreshedToken),
       });

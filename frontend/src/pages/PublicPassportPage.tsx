@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { PassportHeader } from '../components/passport/PassportHeader';
 import { PassportEvidenceBadge } from '../components/passport/PassportEvidenceBadge';
+import { apiUrl } from '../utils/api';
 import { VerifiedMissionCard } from '../components/passport/VerifiedMissionCard';
 import { Card } from '../components/ui/Card';
 import { Badge } from '../components/ui/Badge';
@@ -37,7 +38,7 @@ export const PublicPassportPage: React.FC<PublicPassportPageProps> = ({
     setError(null);
 
     try {
-      const res = await fetch(`/api/passport/${slug}`);
+      const res = await fetch(apiUrl(`/api/passport/${slug}`));
       if (!res.ok) {
         if (res.status === 404) {
           throw new Error(`Proof Passport "${slug}" was not found or has been made private by the candidate.`);

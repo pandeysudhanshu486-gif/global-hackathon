@@ -6,6 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "prebuild": "node -e \"const fs=require('fs'); if(fs.existsSync('../missions')&&!fs.existsSync('./missions')){fs.cpSync('../missions','./missions',{recursive:true})}\" 2>/dev/null || true",
     "build": "tsc",
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
