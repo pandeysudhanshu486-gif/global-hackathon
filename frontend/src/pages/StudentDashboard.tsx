@@ -33,6 +33,11 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
     database: { status: string; state: string };
   } | null>(null);
   const [skillGapData, setSkillGapData] = useState<any | null>(null);
+  const [passportStats, setPassportStats] = useState<{
+    missionsCompleted: number;
+    totalEvidenceRecords: number;
+    skillsWithEvidence: number;
+  } | null>(null);
 
   useEffect(() => {
     // Fetch live system health status
@@ -57,6 +62,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
       })
       .catch((err) => {
         console.debug('Skill gap fetch in dashboard:', err);
+      });
+
+    // Fetch live student passport statistics
+    authFetch('/api/student/passport')
+      .then((res) => res.json())
+      .then((resData) => {
+        if (resData.success && resData.data?.stats) {
+          setPassportStats(resData.data.stats);
+        }
+      })
+      .catch((err) => {
+        console.debug('Passport fetch in dashboard:', err);
       });
   }, []);
 
@@ -247,11 +264,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
                 <p className="text-xs text-zinc-500">Missions</p>
-                <p className="text-lg font-bold text-zinc-900 mt-0.5">1</p>
+                <p className="text-lg font-bold text-zinc-900 mt-0.5">
+                  {passportStats ? passportStats.missionsCompleted : 0}
+                </p>
               </div>
               <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
                 <p className="text-xs text-zinc-500">Evidence Records</p>
-                <p className="text-lg font-bold text-blue-600 mt-0.5">3</p>
+                <p className="text-lg font-bold text-blue-600 mt-0.5">
+                  {passportStats ? passportStats.totalEvidenceRecords : 0}
+                </p>
               </div>
               <div className="p-3 bg-zinc-50 rounded-lg border border-zinc-200">
                 <p className="text-xs text-zinc-500">Integrity</p>
@@ -261,9 +282,15 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
 
             <div className="p-3 rounded-lg border border-zinc-200 bg-zinc-50/50 space-y-1.5">
               <p className="text-xs font-semibold text-zinc-800">Latest Evidence Generated</p>
-              <p className="text-xs text-zinc-600">
-                • <strong>E-Commerce Order API Bug Fix</strong>: 18/18 test assertions passed, root cause explained.
-              </p>
+              {passportStats && passportStats.missionsCompleted > 0 ? (
+                <p className="text-xs text-zinc-600">
+                  • <strong>E-Commerce Order API Bug Fix</strong>: Automated test assertions passed, root cause explained.
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-500 italic">
+                  No mission evidence recorded yet. Launch the recommended mission above to earn your first tamper-proof capability badge!
+                </p>
+              )}
               <p className="text-[11px] text-zinc-400">Timestamped with SHA-256 integrity hash.</p>
             </div>
           </CardContent>

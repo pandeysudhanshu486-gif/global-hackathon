@@ -19,57 +19,56 @@ export interface SidebarProps {
   role?: string;
 }
 
+export const RECRUITER_NAV_GROUPS = [
+  {
+    group: 'RECRUITMENT',
+    items: [
+      { id: 'recruiter-dashboard', label: 'Candidate Directory', icon: Users },
+      { id: 'recruiter-opportunities', label: 'Apprenticeships & Jobs', icon: Briefcase },
+    ],
+  },
+  {
+    group: 'ORGANIZATION',
+    items: [
+      { id: 'recruiter-profile', label: 'Company Profile', icon: Building2 },
+    ],
+  },
+];
+
+export const STUDENT_NAV_GROUPS = [
+  {
+    group: 'OVERVIEW',
+    items: [
+      { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+      { id: 'profile', label: 'Profile & Skills', icon: User },
+    ],
+  },
+  {
+    group: 'SKILLS & GAPS',
+    items: [
+      { id: 'target-role', label: 'Target Role', icon: Target },
+      { id: 'skill-gap', label: 'Skill Gap Map', icon: BarChart3 },
+    ],
+  },
+  {
+    group: 'REAL WORK',
+    items: [
+      { id: 'missions', label: 'Work Missions', icon: Terminal },
+      { id: 'submissions', label: 'Submissions', icon: FolderGit2 },
+    ],
+  },
+  {
+    group: 'HIRING SIGNAL',
+    items: [
+      { id: 'passport', label: 'Proof Passport', icon: ShieldCheck },
+      { id: 'opportunities', label: 'Opportunities', icon: Briefcase },
+    ],
+  },
+];
+
 export const Sidebar: React.FC<SidebarProps> = ({ activeView, onNavigate, role = 'student' }) => {
   const isRecruiter = role === 'recruiter';
-
-  const recruiterNavGroups = [
-    {
-      group: 'RECRUITMENT',
-      items: [
-        { id: 'recruiter-dashboard', label: 'Candidate Directory', icon: Users },
-        { id: 'recruiter-opportunities', label: 'Apprenticeships & Jobs', icon: Briefcase },
-      ],
-    },
-    {
-      group: 'ORGANIZATION',
-      items: [
-        { id: 'recruiter-profile', label: 'Company Profile', icon: Building2 },
-      ],
-    },
-  ];
-
-  const studentNavGroups = [
-    {
-      group: 'OVERVIEW',
-      items: [
-        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-        { id: 'profile', label: 'Profile & Skills', icon: User },
-      ],
-    },
-    {
-      group: 'SKILLS & GAPS',
-      items: [
-        { id: 'target-role', label: 'Target Role', icon: Target },
-        { id: 'skill-gap', label: 'Skill Gap Map', icon: BarChart3 },
-      ],
-    },
-    {
-      group: 'REAL WORK',
-      items: [
-        { id: 'missions', label: 'Work Missions', icon: Terminal },
-        { id: 'submissions', label: 'Submissions', icon: FolderGit2 },
-      ],
-    },
-    {
-      group: 'HIRING SIGNAL',
-      items: [
-        { id: 'passport', label: 'Proof Passport', icon: ShieldCheck },
-        { id: 'opportunities', label: 'Opportunities', icon: Briefcase },
-      ],
-    },
-  ];
-
-  const navGroups = isRecruiter ? recruiterNavGroups : studentNavGroups;
+  const navGroups = isRecruiter ? RECRUITER_NAV_GROUPS : STUDENT_NAV_GROUPS;
 
   return (
     <aside className="w-64 bg-white border-r border-zinc-200 flex flex-col justify-between h-[calc(100vh-4rem)] sticky top-16 select-none">
